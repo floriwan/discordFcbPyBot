@@ -43,6 +43,11 @@ async def nine_nine(ctx):
     response = f'Hallo'
     await ctx.send(response)
 
+@bot.command(name='commands', help='get a list of all bot commands')
+async def commands(ctx):
+    response = f'!metar <icaocode>'
+    await ctx.send(response)
+
 @bot.command(name='metar', help='get metar information for icao airport')
 async def metar(ctx, icao_code: str):
 
