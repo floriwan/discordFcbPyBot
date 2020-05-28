@@ -7,7 +7,7 @@ import logging
 import discord
 import fcbBotUtils
 
-from urllib.request import Request, urlopen
+from urllib.request import URLError, HTTPError, Request, urlopen
 
 from dotenv import load_dotenv
 from discord.ext import commands
@@ -37,6 +37,21 @@ def requestAirportInfoJson(icao_code):
     #print(response_body)
     return json.loads(response_body)
 
+def requestCharts(icao_code):
+    url = 'https://vau.aero/navdb/chart/' +  icao_code.upper() + '.pdf'
+    print("chart url:" + url)
+
+    user_agent = 'Mozilla/5.0 (X11; U; Linux i686) Gecko/20071127 Firefox/2.0.0.11'
+    request = Request(url, headers={'User-Agent': user_agent})
+
+    try:
+        response = urlopen(request)
+        return url
+
+    except HTTPError as e:
+        print ("chart reqeust error code: " + str(e.getcode()))
+        return "no charts available for " + icao_code.upper()
+        
 
 @bot.command(name='hallo', help='Respone with hello')
 async def nine_nine(ctx):
@@ -47,6 +62,19 @@ async def nine_nine(ctx):
 async def commands(ctx):
     response = f'!metar <icaocode>'
     await ctx.send(response)
+
+@bot.command(name='charts', help='get charts for icao airport')
+async def charts(ctx, icao_code: str):
+    response = f'' + requestCharts(icao_code)
+
+    embed = discord.Embed(title="charts for " + icao_code.upper())
+    if response.startswith("no "):
+        embed.add_field(name="charts", value=response)
+    else:
+        embed.add_field(name="charts", value="[Click here for " + icao_code.upper() + " charts](" + response + ")")
+    await ctx.author.send(embed=embed)
+
+    await ctx.send("link to the charts of " + icao_code.upper() + " is send to you")
 
 @bot.command(name='metar', help='get metar information for icao airport')
 async def metar(ctx, icao_code: str):
