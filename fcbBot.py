@@ -8,7 +8,7 @@ import discord
 import fcbBotUtils
 
 from urllib.request import URLError, HTTPError, Request, urlopen
-
+from datetime import datetime
 from dotenv import load_dotenv
 from discord.ext import commands
 
@@ -65,10 +65,8 @@ async def nine_nine(ctx):
 
 @bot.command(name='zulu', help='respond with the zulu time')
 async def zulu(ctx):
-
-    from datetime import datetime
     utctime = datetime.utcnow()
-    await ctx.send("it is " + str(utctime.hour)  + str(utctime.minute) + "z")
+    await ctx.send("it is " + utctime.strftime("%H") + ":" + utctime.strftime("%M") + "z")
 
 @bot.command(name='charts', help='get charts for icao airport')
 async def charts(ctx, icao_code: str):
