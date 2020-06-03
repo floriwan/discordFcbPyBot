@@ -53,15 +53,22 @@ def requestCharts(icao_code):
         return "no charts available for " + icao_code.upper()
         
 
-@bot.command(name='hallo', help='Respone with hello')
+@bot.command(name='hallo', help='respone with hello')
 async def nine_nine(ctx):
     response = f'Hallo'
     await ctx.send(response)
 
-@bot.command(name='commands', help='get a list of all bot commands')
-async def commands(ctx):
-    response = f'!metar <icaocode>'
-    await ctx.send(response)
+#@bot.command(name='commands', help='get a list of all bot commands')
+#async def commands(ctx):
+#    response = f'!metar <icaocode>'
+#    await ctx.send(response)
+
+@bot.command(name='zulu', help='respond with the zulu time')
+async def zulu(ctx):
+
+    from datetime import datetime
+    utctime = datetime.utcnow()
+    await ctx.send("it is " + str(utctime.hour)  + str(utctime.minute) + "z")
 
 @bot.command(name='charts', help='get charts for icao airport')
 async def charts(ctx, icao_code: str):
