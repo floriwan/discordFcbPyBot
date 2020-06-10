@@ -17,6 +17,7 @@ load_dotenv()
 
 AVWX_TOKEN = os.getenv('AVWX_TOKEN')
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+IVAO_STATUS_URL = os.getenv('IVAO_STATUS_URL')
 
 avwx_headers = {
   'Authorization': AVWX_TOKEN
@@ -49,7 +50,7 @@ def requestCharts(icao_code):
         return url
 
     except HTTPError as e:
-        print ("chart reqeust error code: " + str(e.getcode()))
+        print ("chart request error code: " + str(e.getcode()))
         return "no charts available for " + icao_code.upper()
         
 
@@ -62,6 +63,36 @@ async def nine_nine(ctx):
 #async def commands(ctx):
 #    response = f'!metar <icaocode>'
 #    await ctx.send(response)
+
+@bot.command(name='ivao', help='responde with arrival and departures')
+async def ivao(ctx, icao_code: str):
+
+    if len(icao_code) != 4:
+        await ctx.send(icao_code + " is not a valid icao code")
+
+    python_airportInfo = requestAirportInfoJson(icao_code.lower())
+    fcbBotUtils.updateIvao()
+    arrivalList = fcbBotUtils.getDeparture(icao_code.upper())
+    departureList = fcbBotUtils.getDeparture(icao_code.upper(), False)
+
+    print(arrivalList)
+    print(departureList)
+
+    embed = discord.Embed(title="IVAO information for " + \
+        python_airportInfo["name"] + " (" + icao_code.upper() + ")")
+
+    inboundString = ''
+    for flight in arrivalList:
+        inboundString += flight + "\n"
+
+    outboundString = ''
+    for flight in departureList:
+        outboundString += flight + "\n"
+
+    embed.add_field(name="inbound flights", value=inboundString, inline=False)
+    embed.add_field(name="outbound flights", value=outboundString, inline=False)
+
+    await ctx.send(embed=embed)
 
 @bot.command(name='zulu', help='respond with the zulu time')
 async def zulu(ctx):
