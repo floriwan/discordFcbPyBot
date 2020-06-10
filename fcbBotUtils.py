@@ -100,7 +100,11 @@ def requestIvaoStatusFile(ivao_status_url):
     except HTTPError as e:
         print ("ivao status request error: " + str(e.getcode()))
 
-def is_file_older_than_days(file, days=1): 
+def is_file_older_than_days(file, days=1):
+    
+    if not os.path.exists(file):
+        return True
+
     file_time = os.path.getmtime(file) 
     # Check against 24 hours 
     if (time.time() - file_time) / 3600 > 24*days: 

@@ -82,15 +82,21 @@ async def ivao(ctx, icao_code: str):
         python_airportInfo["name"] + " (" + icao_code.upper() + ")")
 
     inboundString = ''
-    for flight in arrivalList:
-        inboundString += flight + "\n"
+    if len(arrivalList) > 0:
+        for flight in arrivalList:
+            inboundString += flight + "\n"
+    else:
+        inboundString = "no inbound flights"
 
     outboundString = ''
-    for flight in departureList:
-        outboundString += flight + "\n"
+    if len(departureList) > 0:
+        for flight in departureList:
+            outboundString += flight + "\n"
+    else:
+        outboundString = "no outbound flights"
 
-    embed.add_field(name="inbound flights", value=inboundString, inline=False)
-    embed.add_field(name="outbound flights", value=outboundString, inline=False)
+    embed.add_field(name="inbound flights", value=inboundString)
+    embed.add_field(name="outbound flights", value=outboundString)
 
     await ctx.send(embed=embed)
 
