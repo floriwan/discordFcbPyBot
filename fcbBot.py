@@ -86,14 +86,14 @@ async def ivao(ctx, icao_code: str):
         for flight in arrivalList:
             inboundString += flight + "\n"
     else:
-        inboundString = "no inbound flights"
+        inboundString = "no flights"
 
     outboundString = ''
     if len(departureList) > 0:
         for flight in departureList:
             outboundString += flight + "\n"
     else:
-        outboundString = "no outbound flights"
+        outboundString = "no flights"
 
     embed.add_field(name="outbound flights", value=inboundString)
     embed.add_field(name="inbound flights", value=outboundString)
