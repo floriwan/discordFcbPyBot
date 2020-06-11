@@ -95,8 +95,8 @@ async def ivao(ctx, icao_code: str):
     else:
         outboundString = "no outbound flights"
 
-    embed.add_field(name="inbound flights", value=inboundString)
-    embed.add_field(name="outbound flights", value=outboundString)
+    embed.add_field(name="outbound flights", value=inboundString)
+    embed.add_field(name="inbound flights", value=outboundString)
 
     await ctx.send(embed=embed)
 

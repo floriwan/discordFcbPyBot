@@ -4,6 +4,7 @@ import math
 import os.path
 import time
 from urllib.request import URLError, HTTPError, Request, urlopen
+from datetime import datetime, timedelta
 
 IVAO_STATUS_FILE = 'ivao_status.txt'
 IVAO_WHAZZUP_FILE = 'ivao_whazzup.txt'
@@ -24,14 +25,29 @@ def getDeparture(icaoCode, departure=True):
 
             if check_code == icaoCode:
 
+                flightplan_departure = split_line[22]
+                flightplan_eet_hours = split_line[24]
+
+                flightplan_eet_minutes = split_line[25]
+    
+                new_fp_departure_string = flightplan_departure[:-2] + ":" + flightplan_departure[-2:]
+                flightplan_departure_datetime = datetime.strptime(new_fp_departure_string, "%H:%M")
+                flightplan_departure_datetime = flightplan_departure_datetime + \
+                        + timedelta(hours = int(flightplan_eet_hours))
+                flightplan_departure_datetime = flightplan_departure_datetime + \
+                        + timedelta(minutes = int(flightplan_eet_minutes))
+
+                flightplan_eat = flightplan_departure_datetime.strftime("%H:%M")
+
+                flight_string = "**" + "{:<9}".format(split_line[0]) + "**" + \
+                        split_line[13] + "   " + flightplan_eat + " UTC"
+
                 if departure:
                     resultArray.append("**" + "{:<9}".format(split_line[0]) + "**" + \
-                        split_line[13] + "   " + 
-                        split_line[22][:2] + ":" + split_line[22][2:] + " UTC")
+                        split_line[13] + "   " + flightplan_eat + " UTC")
                 else:
                     resultArray.append("**" + "{:<9}".format(split_line[0]) + "**" + \
-                        split_line[11] + "   " + 
-                        split_line[22][:2] + ":" + split_line[22][2:] + " UTC")
+                        split_line[11] + "   " + flightplan_eat + " UTC")
 
         except IndexError:
             pass
