@@ -26,6 +26,12 @@ avwx_headers = {
 
 bot = commands.Bot(command_prefix='!')
 
+def requestTafJson(icao_code):
+    request = Request('https://avwx.rest/api/taf/' +  icao_code.lower() + '?options=info,translate,speech', headers=avwx_headers)
+    response_body = urlopen(request).read()
+    #print(response_body)
+    return json.loads(response_body)
+
 def requestMetarJson(icao_code):
     request = Request('https://avwx.rest/api/metar/' +  icao_code.lower(), headers=avwx_headers)
     response_body = urlopen(request).read()
@@ -118,7 +124,30 @@ async def charts(ctx, icao_code: str):
 
     await ctx.send("link to the charts of " + icao_code.upper() + " is send to you")
 
-@bot.command(name='metar', help='get metar information for icao airport')
+@bot.command(name='taf', help='get terminal aerodrome forecast (TAF) for icao airport')
+async def taf(ctx, icao_code: str):
+    if len(icao_code) != 4:
+        await ctx.send("" + icao_code + " is not a valid icao code")
+        return
+    
+    #python_airportInfo = requestAirportInfoJson(icao_code.lower())
+    python_obj = requestTafJson(icao_code.lower())
+    #print(python_obj)
+    raw_taf = python_obj["raw"]
+    #print("taf : " + raw_taf)
+
+    embed = discord.Embed(title="TAF Information for " + \
+        python_obj["info"]["name"] + " (" + icao_code.upper() + ")")
+
+    
+    report_string = "**Time:** " + python_obj["time"]["dt"].replace('T', ' ') + "\n" + \
+        "**Report:** " + python_obj["speech"]
+
+    embed.add_field(name="raw taf", value=python_obj["raw"], inline=False)
+    embed.add_field(name="Report", value=report_string, inline=False)
+    await ctx.send(embed=embed)
+
+@bot.command(name='metar', help='get meteorological aerodrome report (METAR) for icao airport')
 async def metar(ctx, icao_code: str):
 
     if len(icao_code) != 4:
@@ -163,7 +192,7 @@ async def metar(ctx, icao_code: str):
 
     embed = discord.Embed(title="Information for " + \
         python_airportInfo["name"] + " (" + icao_code.upper() + ")\nissued " + cur_date + " at " + cur_time)
-    embed.add_field(name="metar", value=raw_metar, inline=False)
+    embed.add_field(name="raw metar", value=raw_metar, inline=False)
     embed.add_field(name="wind information", value=wind_info, inline=False)
     embed.add_field(name="pressure", value=pressure_info)
     embed.add_field(name="temperatur", value=temp_info)
